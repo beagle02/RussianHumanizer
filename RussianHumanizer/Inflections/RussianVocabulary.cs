@@ -1,4 +1,5 @@
 ﻿using Humanizer;
+using RussianHumanizer.Store;
 
 namespace RussianHumanizer.Inflections;
 
@@ -20,8 +21,26 @@ public class RussianVocabulary
     public string Word(string word, WordForm wordForm, Plurality plurality = Plurality.Singular,
         RussianCase @case = RussianCase.Nominative)
     {
+        if (!_wordDic.ContainsKey(word))
+            return string.Empty;
+
         return wordForm == WordForm.Abbreviation
             ? _wordDic[word].Abbreviation
             : _wordDic[word].GetWord(plurality, @case);
+    }
+
+    public Task Save(IVocabularyStore store)
+    {
+        return store.Save(_wordDic.Values.AsEnumerable());
+    }
+
+    public async Task Load(IVocabularyStore store, bool clear = false)
+    {
+        if (clear)
+            _wordDic.Clear();
+
+        var loaded = await store.Load();
+        foreach (var item in loaded)
+            _wordDic.Add(item.Word, item);
     }
 }

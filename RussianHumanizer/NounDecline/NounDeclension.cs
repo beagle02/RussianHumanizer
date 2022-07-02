@@ -1,4 +1,5 @@
 ﻿using Humanizer;
+using RussianHumanizer.Inflections;
 
 namespace RussianHumanizer.NounDecline;
 
@@ -10,7 +11,8 @@ public static class NounDeclension
 
     public static string Decline(this Noun noun, RussianCase @case)
     {
-        return noun.Word.DeclineNoun(noun.Gender, noun.Animation, @case);
+        var result = RussianVocabularies.Default.Word(noun.Word, WordForm.Normal, Plurality.Singular, @case);
+        return string.IsNullOrEmpty(result) ? noun.Word.DeclineNoun(noun.Gender, noun.Animation, @case) : result;
     }
 
     public static string DeclineNoun(this string word, GrammaticalGender gender, Animation animation, RussianCase @case)
